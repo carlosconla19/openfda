@@ -4,7 +4,7 @@ import json
 headers = {'User-Agent': 'http-client'}
 
 conexion = http.client.HTTPSConnection("api.fda.gov") #Establecemos conexion con la pagina de FDA
-conexion.request("GET", "/drug/label.json?limit=10", None, headers) #Le pedimos que nos de la informacion.
+conexion.request("GET", "/drug/label.json", None, headers) #Le pedimos que nos de la informacion.
 r1 = conexion.getresponse()
 print(r1.status, r1.reason)
 fichero_fila = r1.read().decode("utf-8")
