@@ -1,0 +1,22 @@
+
+import http.client
+import json
+
+headers = {'User-Agent': 'http-client'}
+
+conexion = http.client.HTTPSConnection("api.fda.gov")
+conexion.request("GET", "/drug/label.json?search=_exists_:purpose+AND+_exists_:openfda.manufacturer_name&limit=10", None, headers) #Igual que el programa 1 pero ahora le pongo limites. En este caso 10
+r1 = conexion.getresponse()
+print(r1.status, r1.reason)
+fichero_fila = r1.read().decode("utf-8")
+conexion.close()
+
+fichero = json.loads(fichero_fila)
+id=[]
+for i in range(0,10): #Hacemos un bucle for para ir iterando por los 10 primeros medicamentos y que nos vaya dando la informacion de cada uno.
+    print ("los datos del medicamento", i,"Son: Su id es: ",fichero['results'][i]['id'],"usado en: ",fichero['results'][i]['purpose'],"fabricado por:",fichero['results'][i]['openfda']['manufacturer_name'])
+    id.append(fichero['results'][i]['id'])
+print("La id de las primeras 10 son: ",id )
+
+
+
