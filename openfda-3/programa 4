@@ -1,10 +1,11 @@
+
 #Importo las librerías que voy a utilizar
 import http.server
 import socketserver
 import http.client
 import json
 
-PORT = 8000
+PORT = 8001
 
 def lista_medicamentos():
 
@@ -33,14 +34,14 @@ def lista_medicamentos():
         informacion_medicamento = fichero['results'][i]
         if (informacion_medicamento['openfda']):
             nombre_medicamento = informacion_medicamento['openfda']['substance_name'][0]
-            nuevai = i + 1 #aqui los enumero
+            numeracion = i + 1 #aqui los enumero
 
-            print('El medicamento ',nuevai,' es: ',nombre_medicamento )
+            print('El medicamento ',numeracion,' es: ',nombre_medicamento )
 
             lista_nombres.append(nombre_medicamento)
         else:
-            nuevai=i+1
-            print('El nombre del medicamento ',nuevai,' no está especificado ') #Aqui ponemos cuando no existe
+            numeracion = i + 1
+            print('El nombre del medicamento ',numeracion,' no está especificado ') #Aqui ponemos cuando no existe
             lista_nombres.append("El nombre del medicamento no esta especificado")
 
     return lista_nombres
@@ -57,7 +58,7 @@ class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
         #Creación del html
         contenido_html="""<!doctype html>
                 <html>
-                <body style = 'background-color: red'>
+                <body style = 'background-color: blue'>
                         <h1>Medicamentos</h2>
                 </body>
                 </html>"""
@@ -90,6 +91,8 @@ except KeyboardInterrupt:
     print("El usuario ha parado el servidor")
 httpd.server_close()
 print("Servidor en pausa")
+
+
 
 
 
