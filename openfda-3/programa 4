@@ -1,1 +1,96 @@
+#Importo las librerías que voy a utilizar
+import http.server
+import socketserver
+import http.client
+import json
+
+PORT = 8000
+
+def lista_medicamentos():
+
+    lista_nombres = []
+    headers = {'User-Agent': 'http-client'}
+
+    #Establecemos la conexión con la página web
+    conexion = http.client.HTTPSConnection("api.fda.gov")
+    conexion.request("GET", "/drug/label.json?limit=10", None, headers)
+
+    #Respuesta de la página web
+    r1 = conexion.getresponse()
+    print(r1.status, r1.reason)
+    if r1.status == 200:
+        print ("Todo correcto")
+    else:
+        ("El recurso no está disponible")
+    fichero_fila = r1.read().decode("utf-8") #Descodificamos la respuesta
+    conexion.close() #Cerramos la conexión
+
+
+    fichero = json.loads(fichero_fila) #Convertimos el json en un objeto de python
+
+    #Extraemos la información y la metemos en listas
+    for i in range(len(fichero['results'])):
+        informacion_medicamento = fichero['results'][i]
+        if (informacion_medicamento['openfda']):
+            nombre_medicamento = informacion_medicamento['openfda']['substance_name'][0]
+            nuevai = i + 1 #aqui los enumero
+
+            print('El medicamento ',nuevai,' es: ',nombre_medicamento )
+
+            lista_nombres.append(nombre_medicamento)
+        else:
+            nuevai=i+1
+            print('El nombre del medicamento ',nuevai,' no está especificado ') #Aqui ponemos cuando no existe
+            lista_nombres.append("El nombre del medicamento no esta especificado")
+
+    return lista_nombres
+
+class testHTTPRequestHandler(http.server.BaseHTTPRequestHandler):
+
+    def do_GET(self):
+
+        self.send_response(200) #Respuesta del status. Indicando que funciona bien.
+
+        self.send_header('Content-type', 'text/html') #Indica el tipo de información que me va a devolver
+        self.end_headers()
+
+        #Creación del html
+        contenido_html="""<!doctype html>
+                <html>
+                <body style = 'background-color: red'>
+                        <h1>Medicamentos</h2>
+                </body>
+                </html>"""
+
+        lista_nombres = lista_medicamentos() #Llamo a la función que crea la lista con los datos
+        for i in lista_nombres:
+            contenido_html =contenido_html + '<ol><li>' + i + '</li></ol>'  #aqui creo el html
+
+
+
+
+        self.wfile.write(bytes(contenido_html, "utf8"))
+
+        return
+
+
+# Servidor
+Handler = testHTTPRequestHandler #El manejador es nuestra propia clase
+
+#Conexión al servidor
+httpd = socketserver.TCPServer(("", PORT), Handler)
+print("Sirviendo en el puerto", PORT)
+
+#El servidor estará siempre activo
+try:
+    httpd.serve_forever()
+
+#Si paramos el servidor
+except KeyboardInterrupt:
+    print("El usuario ha parado el servidor")
+httpd.server_close()
+print("Servidor en pausa")
+
+
+
 
